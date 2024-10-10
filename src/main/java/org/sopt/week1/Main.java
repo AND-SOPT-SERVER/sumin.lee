@@ -7,9 +7,9 @@ import java.io.*;
 public class Main {
     public static void main(String[] args) {
         final UI ui;
-        try {
-            ui = new DiaryUI(new DiaryController());
-            ui.runRepeatedly();
+        try { //DiaryUI => DiaryController 를 사용해서 일기 데이터를 처리하는 UI 역할
+            ui = new DiaryUI(new DiaryController()); //DiaryUI 객체가 생성되고, DiaryController 가 함께 전달
+            ui.runRepeatedly(); //DiaryUI 객체가 생성된 후, ui.runRepeatedly() 메서드가 호출돼서 사용자의 명령어 입력을 반복적으로 처리하는 루프가 시작
         } catch (Throwable t) {
 
         }
