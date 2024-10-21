@@ -52,15 +52,11 @@ public class DiaryService {
            diaryRepository.save(diary);
        }
 
-
-
-       //내용 유효성 검사
-
    }
 
 public List<DiaryResponse>getDiaryList(){
     // 모든 일기 데이터를 가져옴 (정렬 없이)
-    List <DiaryEntity> allDiaries = diaryRepository.findAll(); //allDiaries: 데이터베이스에서 가져온 일기 정보 ( 클라이언트에게 전달할 때는 DiaryResponse)
+    List <DiaryEntity> allDiaries = diaryRepository.findAll(); //allDiaries: 데이터베이스에서 가져온 일기 정보 (클라이언트에게 전달할 때는 DiaryResponse)
 
     // 일기의 생성일 기준으로 내림차순 정렬
 
@@ -104,7 +100,18 @@ public List<DiaryResponse>getDiaryList(){
                 diaryEntity.getCreatedAt()
         );
     }
+public void deleteDiary(Long diaryId){
+        Optional <DiaryEntity> optionalDiaryEntity = diaryRepository.findById(diaryId);
 
+        if (!optionalDiaryEntity.isPresent()){
+            throw  new IllegalArgumentException("삭제할 일기가 존재하지 않습니다");
+        }
+        // 존재하는 일기를 삭제
+        DiaryEntity diary = optionalDiaryEntity.get();
+        diaryRepository.delete(diary);
+
+
+}
 
     }
 

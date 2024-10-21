@@ -45,4 +45,10 @@ public class DiaryController { //클라이언트와 요청을 주고받는 역�
         diaryService.updateDiary(diaryId,diaryRequest);
         return ResponseEntity.ok("일기가 수정되었습니다");
     }
+
+    @DeleteMapping("/luckybicky/diaries/{diaryId}")
+    public ResponseEntity<String> deleteDiary(@PathVariable Long diaryId){
+        diaryService.deleteDiary(diaryId);
+        return ResponseEntity.ok("일기가 삭제되었습니다");
+    }
 }
