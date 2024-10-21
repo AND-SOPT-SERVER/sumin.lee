@@ -1,5 +1,6 @@
 package org.sopt.diary.service;
 
+import org.sopt.diary.api.DetailedDiaryResponse;
 import org.sopt.diary.api.DiaryListResponse;
 import org.sopt.diary.api.DiaryRequest;
 import org.sopt.diary.api.DiaryResponse;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class DiaryService {
@@ -31,6 +33,30 @@ public class DiaryService {
        return diaryEntity.getId();
    }
 
+   public void updateDiary(Long diaryId, DiaryRequest diaryRequest){
+        Optional <DiaryEntity> optionalDiaryEntity = diaryRepository.findById(diaryId);
+        if (!optionalDiaryEntity.isPresent()){
+            throw new IllegalArgumentException("해당 ID의 일기를 찾을 수 없습니다.");
+        }
+       DiaryEntity diary = optionalDiaryEntity.get();
+
+        //제목이 존재하고 30자를 넘지 않으면 수정
+       if (diaryRequest.getTitle() !=null && diaryRequest.getTitle().length() <=30){
+           diary.setTitle(diaryRequest.getTitle());
+           diaryRepository.save(diary);
+       }
+
+       // 내용이 존재하고 100자를 넘지 않으면 수정
+       if (diaryRequest.getContent() !=null && diaryRequest.getContent().length() <=100){
+           diary.setContent(diaryRequest.getContent());
+           diaryRepository.save(diary);
+       }
+
+
+
+       //내용 유효성 검사
+
+   }
 
 public List<DiaryResponse>getDiaryList(){
     // 모든 일기 데이터를 가져옴 (정렬 없이)
@@ -57,4 +83,28 @@ public List<DiaryResponse>getDiaryList(){
         }
         return diaryList;
     }
-}
+
+
+    public DetailedDiaryResponse getDiaryDetail(Long diaryId) {
+
+        //DiaryEntity조회
+        Optional<DiaryEntity> optionalDiaryEntity = diaryRepository.findById(diaryId);
+
+        if (!optionalDiaryEntity.isPresent()) {
+            throw new IllegalArgumentException("해당 ID의 일기를 찾을 수 없습니다.");
+        }
+
+        DiaryEntity diaryEntity = optionalDiaryEntity.get();
+
+        // DiaryEntity -> DetailedDiaryResponse 변환 후 반환해야함 (클라이언트가 받는 응답 형식으로)
+        return new DetailedDiaryResponse(
+                diaryEntity.getId(),
+                diaryEntity.getTitle(),
+                diaryEntity.getContent(),
+                diaryEntity.getCreatedAt()
+        );
+    }
+
+
+    }
+

@@ -4,10 +4,7 @@ package org.sopt.diary.api;
 import org.sopt.diary.service.Diary;
 import org.sopt.diary.service.DiaryService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +18,6 @@ public class DiaryController { //클라이언트와 요청을 주고받는 역�
     }
 
     //일기 작성 기능
-    /*
-    - 클라이언트로부터 DiaryRequest 데이터를 받음.
-    - 30자 제한을 준수하는지 확인.
-    - DiaryService를 호출해 일기를 저장.
-
-     */
     @PostMapping("/luckybicky/diaries")
     public ResponseEntity<SimpleDiaryResponse> writeDiary(@RequestBody DiaryRequest diaryRequest) {
         Long diaryId = diaryService.createDiary(diaryRequest);
@@ -41,5 +32,17 @@ public class DiaryController { //클라이언트와 요청을 주고받는 역�
         List <DiaryResponse> diaries = diaryService.getDiaryList();
                 return ResponseEntity.ok(diaries);
 
+    }
+
+    @GetMapping("/luckybicky/diaries/{diaryId}")
+    public ResponseEntity<DetailedDiaryResponse> getDiaryDetail(@PathVariable Long diaryId){
+        DetailedDiaryResponse detailedDiaryResponse = diaryService.getDiaryDetail(diaryId);
+        return ResponseEntity.ok(detailedDiaryResponse);
+    }
+
+    @PatchMapping("/luckybicky/diaries/{diaryId}")
+    public ResponseEntity<String> updateDiary(@PathVariable Long diaryId, @RequestBody DiaryRequest diaryRequest){
+        diaryService.updateDiary(diaryId,diaryRequest);
+        return ResponseEntity.ok("일기가 수정되었습니다");
     }
 }

@@ -1,13 +1,15 @@
 package org.sopt.diary.api;
 
 
-public class DiaryResponse {
+public class DiaryEditResponse {
     private Long id;
     private String title;
+    private String content;
 
-    public DiaryResponse(Long id, String title) {
+    public DiaryEditResponse(Long id, String title, String content) {
         this.id = id;
         this.title = title;
+        this.content = content;
     }
 
     // Getter methods
@@ -17,5 +19,8 @@ public class DiaryResponse {
 
     public String getTitle() {
         return title;
+    }
+    public String getContent() {
+        return content;
     }
 }

@@ -19,8 +19,7 @@ public class DiaryEntity {
     @Column
     private LocalDateTime createdAt;
 
-    @Column
-    private LocalDateTime updatedAt;
+
 
     // 기본 생성자 (JPA에서 사용)
     public DiaryEntity() {}
@@ -33,7 +32,7 @@ public class DiaryEntity {
         this.title = title;
         this.content = content;
         this.createdAt = LocalDateTime.now(); // 생성 시점의 현재 시간
-        this.updatedAt = LocalDateTime.now(); // 생성 시점의 현재 시간
+
     }
 
     // Getter
@@ -53,13 +52,19 @@ public class DiaryEntity {
         return createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    // 업데이트할 때 수정 시간을 갱신하는 메서드 (필요시 사용)
-    public void updateContent(String content) {
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setContent(String content) {
         this.content = content;
-        this.updatedAt = LocalDateTime.now(); // 수정 시점의 현재 시간으로 갱신
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
