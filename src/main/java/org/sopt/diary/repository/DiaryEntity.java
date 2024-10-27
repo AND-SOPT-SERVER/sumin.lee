@@ -18,19 +18,21 @@ public class DiaryEntity {
 
     @Column
     private LocalDateTime createdAt;
-
+    @Column // 카테고리 필드 추가
+    private String category;
 
 
     // 기본 생성자 (JPA에서 사용)
     public DiaryEntity() {}
 
     // 필수값인 title과 content를 받는 생성자
-    public DiaryEntity(String title, String content) {
-        if (title == null || content == null) {
+    public DiaryEntity(String title, String content,String category) {
+        if (title == null || content == null ) {
             throw new IllegalArgumentException("Title과 Content는 반드시 필요합니다.");
         }
         this.title = title;
         this.content = content;
+        this.category = category;
         this.createdAt = LocalDateTime.now(); // 생성 시점의 현재 시간
 
     }
@@ -66,5 +68,13 @@ public class DiaryEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }
