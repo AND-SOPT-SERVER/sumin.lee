@@ -23,22 +23,18 @@ public class DiaryService {
     }
 
    public Long createDiary(DiaryRequest diaryRequest){
-
-        //5분 이후에 작성된건지 유효성 검사
-       if (lastDiaryTime != null && lastDiaryTime.plusMinutes(5).isAfter(LocalDateTime.now())) {
-           throw new IllegalArgumentException("5분 내에 일기를 작성할 수 없습니다.");
-       }
-
+        validateDiaryInterval();
        // 제목과 내용의 유효성 검사는 DiaryRequest의 매서드 이용, 중복성 검사는 서비스단에서 처리
        if (!diaryRequest.isValid()) {
            throw new IllegalArgumentException("제목은 30자, 내용은 100자를 초과할 수 없습니다.");
        }
+        validateDuplicateTitle(diaryRequest.getTitle());
 
-       // 제목 중복 확인
-       Optional<DiaryEntity> existingDiary = diaryRepository.findByTitle(diaryRequest.getTitle());
-       if (existingDiary.isPresent()) {
+
+       //ifPresent 메서드를 사용하여, Optional 값이 존재할 경우 람다식으로 지정한 예외를 던지는 방식으로 수정.
+       diaryRepository.findByTitle(diaryRequest.getTitle()).ifPresent(diary -> { //diary는 Optional 안의 값(존재할 경우의 DiaryEntity)을 가리킴 // 값이 존재할 때만 IllegalArgumentException이 발생
            throw new IllegalArgumentException("중복된 제목의 일기가 이미 존재합니다.");
-       }
+       });
 
 
        // DiaryEntity 생성 후 저장
@@ -50,6 +46,25 @@ public class DiaryService {
        return diaryEntity.getId();
    }
 
+
+    //원래 createDiary내부에서 처리 되는 로직이었지만, 책임 분리하기 위해 함수 생성
+    private void validateDiaryInterval() {
+        if (lastDiaryTime != null && lastDiaryTime.plusMinutes(5).isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("5분 내에 일기를 작성할 수 없습니다.");
+        }
+    }
+    //원래 createDiary내부에서 처리 되는 로직이었지만, 책임 분리하기 위해 함수 생성
+    private void validateDuplicateTitle(String title) {
+        diaryRepository.findByTitle(title).ifPresent(diary -> { //수정된 코드
+            throw new IllegalArgumentException("중복된 제목의 일기가 이미 존재합니다.");
+        });
+    }
+// 제목 중복 확인(이전 코드)
+//       Optional<DiaryEntity> existingDiary = diaryRepository.findByTitle(diaryRequest.getTitle());
+//       if (existingDiary.isPresent()) {
+//           throw new IllegalArgumentException("중복된 제목의 일기가 이미 존재합니다.");
+//       }
+
    public void updateDiary(Long diaryId, DiaryRequest diaryRequest){
         Optional <DiaryEntity> optionalDiaryEntity = diaryRepository.findById(diaryId);
         if (!optionalDiaryEntity.isPresent()){
@@ -58,17 +73,25 @@ public class DiaryService {
        DiaryEntity diary = optionalDiaryEntity.get();
 
         //제목이 존재하고 30자를 넘지 않으면 수정
-       if (diaryRequest.getTitle() !=null && diaryRequest.getTitle().length() <=30){
-           diary.setTitle(diaryRequest.getTitle());
-           diaryRepository.save(diary);
-       }
+       // 제목과 내용 업데이트 전 유효성 검사
+       updateTitleIfValid(diary, diaryRequest.getTitle());
+       updateContentIfValid(diary, diaryRequest.getContent());
 
-       // 내용이 존재하고 100자를 넘지 않으면 수정
-       if (diaryRequest.getContent() !=null && diaryRequest.getContent().length() <=100){
-           diary.setContent(diaryRequest.getContent());
-           diaryRepository.save(diary);
-       }
+       diaryRepository.save(diary);
 
+   }
+
+    //원래 updateDiary내부에서 처리 되는 로직이었지만, 책임 분리하기 위해 함수 생성
+   private  void updateTitleIfValid(DiaryEntity diary, String title){
+       if (title != null && title.length() <= 30) {
+           diary.setTitle(title);
+       }
+   }
+    //원래 updateDiary내부에서 처리 되는 로직이었지만, 책임 분리하기 위해 함수 생성
+   private void updateContentIfValid(DiaryEntity diary, String content){
+        if (content !=null && content.length()<=100){
+            diary.setContent(content);
+        }
    }
 
     public List<DiaryResponse> getDiaryList() {
@@ -122,18 +145,22 @@ public class DiaryService {
                 diaryEntity.getCreatedAt()
         );
     }
-public void deleteDiary(Long diaryId){
-        Optional <DiaryEntity> optionalDiaryEntity = diaryRepository.findById(diaryId);
+//public void deleteDiary(Long diaryId){
+//        Optional <DiaryEntity> optionalDiaryEntity = diaryRepository.findById(diaryId);
+//
+//        if (!optionalDiaryEntity.isPresent()){
+//            throw  new IllegalArgumentException("삭제할 일기가 존재하지 않습니다");
+//        }
+//        // 존재하는 일기를 삭제
+//        DiaryEntity diary = optionalDiaryEntity.get();
+//        diaryRepository.delete(diary);
+//
+//
+//}
 
-        if (!optionalDiaryEntity.isPresent()){
-            throw  new IllegalArgumentException("삭제할 일기가 존재하지 않습니다");
-        }
-        // 존재하는 일기를 삭제
-        DiaryEntity diary = optionalDiaryEntity.get();
-        diaryRepository.delete(diary);
-
-
-}
+    public void deleteDiary(Long diaryId) {
+        diaryRepository.deleteById(diaryId); //deleteById 메서드는 ID를 통해 엔티티를 바로 삭제
+    }
 
     }
 
